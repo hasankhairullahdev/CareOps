@@ -1,0 +1,114 @@
+{
+  "id": "careops",
+  "realm": "careops",
+  "displayName": "CareOps",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "roles": {
+    "realm": [
+      { "name": "admin", "description": "Full access all services" },
+      { "name": "receptionist", "description": "Patient + appointment create/read" },
+      { "name": "doctor", "description": "Patient read/update, appointment read, pharmacy create prescription" },
+      { "name": "pharmacist", "description": "Pharmacy full, patient read" },
+      { "name": "cashier", "description": "Billing full, appointment read, patient read" },
+      { "name": "patient", "description": "Own data only" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "careops-frontend",
+      "name": "CareOps Frontend",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    },
+    {
+      "clientId": "api-gateway",
+      "name": "API Gateway",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "api-gateway-secret",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": false
+    }
+  ],
+  "users": [
+    {
+      "username": "admin@hospital.com",
+      "email": "admin@hospital.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "System",
+      "lastName": "Admin",
+      "credentials": [{ "type": "password", "value": "Admin123!", "temporary": false }],
+      "realmRoles": ["admin"]
+    },
+    {
+      "username": "reception@hospital.com",
+      "email": "reception@hospital.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Sari",
+      "lastName": "Resepsionis",
+      "credentials": [{ "type": "password", "value": "Admin123!", "temporary": false }],
+      "realmRoles": ["receptionist"]
+    },
+    {
+      "username": "doctor@hospital.com",
+      "email": "doctor@hospital.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Dr. Budi",
+      "lastName": "Dokter",
+      "credentials": [{ "type": "password", "value": "Admin123!", "temporary": false }],
+      "realmRoles": ["doctor"]
+    },
+    {
+      "username": "pharmacist@hospital.com",
+      "email": "pharmacist@hospital.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Apoteker",
+      "lastName": "Jaya",
+      "credentials": [{ "type": "password", "value": "Admin123!", "temporary": false }],
+      "realmRoles": ["pharmacist"]
+    },
+    {
+      "username": "cashier@hospital.com",
+      "email": "cashier@hospital.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Kasir",
+      "lastName": "Cepat",
+      "credentials": [{ "type": "password", "value": "Admin123!", "temporary": false }],
+      "realmRoles": ["cashier"]
+    },
+    {
+      "username": "patient@hospital.com",
+      "email": "patient@hospital.com",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Pasien",
+      "lastName": "Baru",
+      "credentials": [{ "type": "password", "value": "Admin123!", "temporary": false }],
+      "realmRoles": ["patient"]
+    }
+  ]
+}
