@@ -108,6 +108,54 @@ services:
       timeout: 10s
       retries: 3
 
+  pharmacy-service:
+    build:
+      context: ./services/pharmacy-service
+      dockerfile: Dockerfile
+    container_name: hospital_pharmacy_service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=pharmacy_db;Username=postgres;Password=postgres"
+      Keycloak__Authority: "http://keycloak:8080/realms/careops"
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+      Urls: "http://+:5003"
+    ports:
+      - "5003:5003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5003/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: hospital_notification_service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+      Urls: "http://+:5005"
+    ports:
+      - "5005:5005"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5005/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   api-gateway:
     build:
       context: ./gateway/HospitalGateway
