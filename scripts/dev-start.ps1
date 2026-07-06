@@ -29,8 +29,8 @@ if ($Stop) {
             Write-Ok "Killed PID $($_.Id)"
         }
     }
-    Write-Step "Stopping Docker infra..."
-    docker-compose -f "$Root\docker-compose.infra.yml" down
+    Write-Step "Stopping Podman infra..."
+    podman compose -f "$Root\docker-compose.infra.yml" down
     Write-Ok "Done."
     exit 0
 }
@@ -44,16 +44,16 @@ if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
 }
 Write-Ok ".NET SDK: $(dotnet --version)"
 
-if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-    Write-Error "Docker not found. Install Docker Desktop."
+if (-not (Get-Command podman -ErrorAction SilentlyContinue)) {
+    Write-Error "Podman not found. Install from https://podman.io"
     exit 1
 }
-Write-Ok "Docker: $(docker --version)"
+Write-Ok "Podman: $(podman --version)"
 
 # ─── START INFRA ───────────────────────────────────────────────────────────────
 Write-Step "Starting infrastructure (PostgreSQL, RabbitMQ, Keycloak)..."
 Push-Location $Root
-docker-compose -f docker-compose.infra.yml up -d
+podman compose -f docker-compose.infra.yml up -d
 Pop-Location
 Write-Ok "Infrastructure containers started."
 
@@ -62,7 +62,7 @@ Write-Step "Waiting for PostgreSQL to be ready..."
 $retries = 0
 do {
     Start-Sleep -Seconds 3
-    $result = docker exec hospital_postgres pg_isready -U postgres 2>&1
+    $result = podman exec hospital_postgres pg_isready -U postgres 2>&1
     $retries++
     if ($retries -gt 20) { Write-Error "PostgreSQL not ready after 60s. Aborting."; exit 1 }
 } while ($result -notmatch "accepting connections")
@@ -73,7 +73,7 @@ Write-Step "Waiting for RabbitMQ to be ready..."
 $retries = 0
 do {
     Start-Sleep -Seconds 3
-    $result = docker exec hospital_rabbitmq rabbitmq-diagnostics ping 2>&1
+    $result = podman exec hospital_rabbitmq rabbitmq-diagnostics ping 2>&1
     $retries++
     if ($retries -gt 20) { Write-Error "RabbitMQ not ready after 60s. Aborting."; exit 1 }
 } while ($result -notmatch "Ping succeeded")
