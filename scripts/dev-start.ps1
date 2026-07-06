@@ -73,12 +73,8 @@ Write-Step "Waiting for RabbitMQ to be ready..."
 $retries = 0
 do {
     Start-Sleep -Seconds 4
-    try {
-        $r = Invoke-WebRequest -Uri "http://localhost:15672/api/healthchecks/node" `
-            -Credential (New-Object PSCredential("guest", (ConvertTo-SecureString "guest" -AsPlainText -Force))) `
-            -ErrorAction Stop
-        if ($r.StatusCode -eq 200) { break }
-    } catch { }
+    $result = podman exec hospital_rabbitmq rabbitmq-diagnostics -q ping 2>&1
+    if ($LASTEXITCODE -eq 0) { break }
     $retries++
     if ($retries -gt 25) { Write-Error "RabbitMQ not ready after 100s. Aborting."; exit 1 }
 } while ($true)
