@@ -101,13 +101,14 @@ Write-Step "Starting backend services in separate windows..."
 foreach ($svc in $Services) {
     $fullPath = Join-Path $Root $svc.Path
     $title    = "CareOps | $($svc.Name) :$($svc.Port)"
-    $env      = "ASPNETCORE_ENVIRONMENT=Development"
 
-    Start-Process powershell -ArgumentList @(
-        "-NoExit",
-        "-Command",
+    $cmd = if ($svc.Cmd -eq "npm") {
+        "& { `$host.UI.RawUI.WindowTitle = '$title'; Set-Location '$fullPath'; npm run dev }"
+    } else {
         "& { `$host.UI.RawUI.WindowTitle = '$title'; Set-Location '$fullPath'; `$env:ASPNETCORE_ENVIRONMENT = 'Development'; dotnet run }"
-    ) -WindowStyle Normal
+    }
+
+    Start-Process powershell -ArgumentList @("-NoExit", "-Command", $cmd) -WindowStyle Normal
 
     Write-Ok "Started $($svc.Name) → $($svc.Url)"
     Start-Sleep -Milliseconds 800
@@ -133,6 +134,7 @@ Write-Host "══════════════════════�
 Write-Host "  CareOps Dev Environment Running" -ForegroundColor Cyan
 Write-Host "══════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
+Write-Host "  Frontend           http://localhost:3000" -ForegroundColor White
 Write-Host "  API Gateway        http://localhost:5000" -ForegroundColor White
 Write-Host "  Patient Service    http://localhost:5001/swagger" -ForegroundColor White
 Write-Host "  Appointment Svc    http://localhost:5002/swagger" -ForegroundColor White
