@@ -64,11 +64,11 @@ namespace PharmacyService.Infrastructure.Persistence.Migrations
                 new[] { "Id", "Name", "GenericName", "Category", "Unit", "StockQuantity", "MinimumStock", "Price", "ExpiryDate" },
                 new object[,]
                 {
-                    { new Guid("m0000000-0000-0000-0000-000000000001"), "Paracetamol 500mg", "Paracetamol", "Analgesic", "Tablet", 500, 50, 500m, new DateOnly(2026, 12, 31) },
-                    { new Guid("m0000000-0000-0000-0000-000000000002"), "Amoxicillin 500mg", "Amoxicillin", "Antibiotic", "Kapsul", 200, 30, 2500m, new DateOnly(2026, 6, 30) },
-                    { new Guid("m0000000-0000-0000-0000-000000000003"), "Omeprazole 20mg", "Omeprazole", "Antacid", "Kapsul", 150, 20, 3000m, new DateOnly(2026, 9, 30) },
-                    { new Guid("m0000000-0000-0000-0000-000000000004"), "Cetirizine 10mg", "Cetirizine", "Antihistamine", "Tablet", 10, 20, 1500m, new DateOnly(2025, 3, 31) },
-                    { new Guid("m0000000-0000-0000-0000-000000000005"), "Metformin 500mg", "Metformin", "Antidiabetic", "Tablet", 300, 50, 1000m, new DateOnly(2026, 12, 31) }
+                    { new Guid("00000000-0000-0000-0000-000000000001"), "Paracetamol 500mg", "Paracetamol", "Analgesic", "Tablet", 500, 50, 500m, new DateOnly(2026, 12, 31) },
+                    { new Guid("00000000-0000-0000-0000-000000000002"), "Amoxicillin 500mg", "Amoxicillin", "Antibiotic", "Kapsul", 200, 30, 2500m, new DateOnly(2026, 6, 30) },
+                    { new Guid("00000000-0000-0000-0000-000000000003"), "Omeprazole 20mg", "Omeprazole", "Antacid", "Kapsul", 150, 20, 3000m, new DateOnly(2026, 9, 30) },
+                    { new Guid("00000000-0000-0000-0000-000000000004"), "Cetirizine 10mg", "Cetirizine", "Antihistamine", "Tablet", 10, 20, 1500m, new DateOnly(2025, 3, 31) },
+                    { new Guid("00000000-0000-0000-0000-000000000005"), "Metformin 500mg", "Metformin", "Antidiabetic", "Tablet", 300, 50, 1000m, new DateOnly(2026, 12, 31) }
                 });
         }
 

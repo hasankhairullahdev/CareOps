@@ -55,11 +55,11 @@ public class PharmacyDbContext : DbContext
 
         // Seed medicines
         modelBuilder.Entity<Medicine>().HasData(
-            new { Id = new Guid("m0000000-0000-0000-0000-000000000001"), Name = "Paracetamol 500mg", GenericName = "Paracetamol", Category = "Analgesic", Unit = "Tablet", StockQuantity = 500, MinimumStock = 50, Price = 500m, ExpiryDate = new DateOnly(2026, 12, 31) },
-            new { Id = new Guid("m0000000-0000-0000-0000-000000000002"), Name = "Amoxicillin 500mg", GenericName = "Amoxicillin", Category = "Antibiotic", Unit = "Kapsul", StockQuantity = 200, MinimumStock = 30, Price = 2500m, ExpiryDate = new DateOnly(2026, 6, 30) },
-            new { Id = new Guid("m0000000-0000-0000-0000-000000000003"), Name = "Omeprazole 20mg", GenericName = "Omeprazole", Category = "Antacid", Unit = "Kapsul", StockQuantity = 150, MinimumStock = 20, Price = 3000m, ExpiryDate = new DateOnly(2026, 9, 30) },
-            new { Id = new Guid("m0000000-0000-0000-0000-000000000004"), Name = "Cetirizine 10mg", GenericName = "Cetirizine", Category = "Antihistamine", Unit = "Tablet", StockQuantity = 10, MinimumStock = 20, Price = 1500m, ExpiryDate = new DateOnly(2025, 3, 31) },
-            new { Id = new Guid("m0000000-0000-0000-0000-000000000005"), Name = "Metformin 500mg", GenericName = "Metformin", Category = "Antidiabetic", Unit = "Tablet", StockQuantity = 300, MinimumStock = 50, Price = 1000m, ExpiryDate = new DateOnly(2026, 12, 31) }
+            new { Id = new Guid("00000000-0000-0000-0000-000000000001"), Name = "Paracetamol 500mg", GenericName = "Paracetamol", Category = "Analgesic", Unit = "Tablet", StockQuantity = 500, MinimumStock = 50, Price = 500m, ExpiryDate = new DateOnly(2026, 12, 31) },
+            new { Id = new Guid("00000000-0000-0000-0000-000000000002"), Name = "Amoxicillin 500mg", GenericName = "Amoxicillin", Category = "Antibiotic", Unit = "Kapsul", StockQuantity = 200, MinimumStock = 30, Price = 2500m, ExpiryDate = new DateOnly(2026, 6, 30) },
+            new { Id = new Guid("00000000-0000-0000-0000-000000000003"), Name = "Omeprazole 20mg", GenericName = "Omeprazole", Category = "Antacid", Unit = "Kapsul", StockQuantity = 150, MinimumStock = 20, Price = 3000m, ExpiryDate = new DateOnly(2026, 9, 30) },
+            new { Id = new Guid("00000000-0000-0000-0000-000000000004"), Name = "Cetirizine 10mg", GenericName = "Cetirizine", Category = "Antihistamine", Unit = "Tablet", StockQuantity = 10, MinimumStock = 20, Price = 1500m, ExpiryDate = new DateOnly(2025, 3, 31) },
+            new { Id = new Guid("00000000-0000-0000-0000-000000000005"), Name = "Metformin 500mg", GenericName = "Metformin", Category = "Antidiabetic", Unit = "Tablet", StockQuantity = 300, MinimumStock = 50, Price = 1000m, ExpiryDate = new DateOnly(2026, 12, 31) }
         );
     }
 }
