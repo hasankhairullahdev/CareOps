@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: appointment-service-config
+  namespace: careops
+data:
+  ASPNETCORE_ENVIRONMENT: Production
+  Keycloak__Authority: "http://keycloak:8080/realms/careops"
+  Keycloak__Audience: "account"
+  RabbitMQ__Host: rabbitmq
+  RabbitMQ__Username: guest
+  RabbitMQ__Password: guest
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: appointment-service-secret
+  namespace: careops
+type: Opaque
+stringData:
+  ConnectionStrings__DefaultConnection: "Host=postgres;Database=appointment_db;Username=postgres;Password=postgres"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appointment-service
+  namespace: careops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appointment-service
+  template:
+    metadata:
+      labels:
+        app: appointment-service
+    spec:
+      containers:
+        - name: appointment-service
+          image: ghcr.io/hasankhairullahdev/careops/appointment-service:latest
+          ports:
+            - containerPort: 5002
+          envFrom:
+            - configMapRef:
+                name: appointment-service-config
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: appointment-service-secret
+                  key: ConnectionStrings__DefaultConnection
+            - name: Urls
+              value: "http://+:5002"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5002
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appointment-service
+  namespace: careops
+spec:
+  selector:
+    app: appointment-service
+  ports:
+    - port: 5002
+      targetPort: 5002

@@ -1,0 +1,67 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["Build & Push Docker Images"]
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: Image tag to deploy (default: latest)
+        required: false
+        default: latest
+
+jobs:
+  deploy:
+    name: Deploy to Minikube / AKS
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Configure kubeconfig
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
+        run: |
+          mkdir -p ~/.kube
+          echo "$KUBECONFIG_B64" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Determine image tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=sha-$(echo ${{ github.event.workflow_run.head_sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install careops ./helm/careops \
+            --namespace careops \
+            --create-namespace \
+            --set global.imageTag=${{ steps.tag.outputs.tag }} \
+            --set global.imageRegistry=ghcr.io/${{ github.repository_owner }}/careops \
+            --set frontend.nextauthSecret=${{ secrets.NEXTAUTH_SECRET }} \
+            --wait \
+            --timeout 10m
+
+      - name: Verify rollout
+        run: |
+          kubectl rollout status deployment/patient-service -n careops
+          kubectl rollout status deployment/appointment-service -n careops
+          kubectl rollout status deployment/pharmacy-service -n careops
+          kubectl rollout status deployment/billing-service -n careops
+          kubectl rollout status deployment/notification-service -n careops
+          kubectl rollout status deployment/api-gateway -n careops
+          kubectl rollout status deployment/frontend -n careops

@@ -1,0 +1,13 @@
+apiVersion: v2
+name: careops
+description: CareOps Hospital Management System — full microservices stack
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - hospital
+  - microservices
+  - healthcare
+maintainers:
+  - name: hasankhairullahdev
+    url: https://github.com/hasankhairullahdev

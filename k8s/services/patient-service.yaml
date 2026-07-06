@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: patient-service-config
+  namespace: careops
+data:
+  ASPNETCORE_ENVIRONMENT: Production
+  Keycloak__Authority: "http://keycloak:8080/realms/careops"
+  Keycloak__Audience: "account"
+  RabbitMQ__Host: rabbitmq
+  RabbitMQ__Username: guest
+  RabbitMQ__Password: guest
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: patient-service-secret
+  namespace: careops
+type: Opaque
+stringData:
+  ConnectionStrings__DefaultConnection: "Host=postgres;Database=patient_db;Username=postgres;Password=postgres"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: patient-service
+  namespace: careops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: patient-service
+  template:
+    metadata:
+      labels:
+        app: patient-service
+    spec:
+      containers:
+        - name: patient-service
+          image: ghcr.io/hasankhairullahdev/careops/patient-service:latest
+          ports:
+            - containerPort: 5001
+          envFrom:
+            - configMapRef:
+                name: patient-service-config
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: patient-service-secret
+                  key: ConnectionStrings__DefaultConnection
+            - name: Urls
+              value: "http://+:5001"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5001
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: patient-service
+  namespace: careops
+spec:
+  selector:
+    app: patient-service
+  ports:
+    - port: 5001
+      targetPort: 5001

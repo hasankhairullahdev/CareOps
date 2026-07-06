@@ -1,0 +1,113 @@
+global:
+  namespace: careops
+  imageRegistry: ghcr.io/hasankhairullahdev/careops
+  imageTag: latest
+  imagePullPolicy: IfNotPresent
+
+postgres:
+  image: postgres:16-alpine
+  password: postgres
+  storage: 5Gi
+
+rabbitmq:
+  image: rabbitmq:3-management-alpine
+  username: guest
+  password: guest
+
+keycloak:
+  image: quay.io/keycloak/keycloak:23.0
+  adminPassword: admin
+  realmName: careops
+
+patientService:
+  replicas: 1
+  port: 5001
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+appointmentService:
+  replicas: 1
+  port: 5002
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+pharmacyService:
+  replicas: 1
+  port: 5003
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+billingService:
+  replicas: 1
+  port: 5004
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+notificationService:
+  replicas: 1
+  port: 5005
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+apiGateway:
+  replicas: 1
+  port: 5000
+  nodePort: 30500
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+frontend:
+  replicas: 1
+  port: 3000
+  nodePort: 30300
+  nextauthUrl: "http://careops.local"
+  nextauthSecret: "careops-nextauth-secret-change-me-in-production"
+  keycloakClientId: "careops-frontend"
+  keycloakClientSecret: ""
+  keycloakIssuer: "http://auth.careops.local/realms/careops"
+  apiUrl: "http://api.careops.local"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    frontend: careops.local
+    api: api.careops.local
+    auth: auth.careops.local
