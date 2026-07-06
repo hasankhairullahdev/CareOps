@@ -154,6 +154,32 @@ services:
       timeout: 10s
       retries: 3
 
+  billing-service:
+    build:
+      context: ./services/billing-service
+      dockerfile: Dockerfile
+    container_name: hospital_billing_service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=billing_db;Username=postgres;Password=postgres"
+      Keycloak__Authority: "http://keycloak:8080/realms/careops"
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+      Urls: "http://+:5004"
+    ports:
+      - "5004:5004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5004/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   api-gateway:
     build:
       context: ./gateway/HospitalGateway

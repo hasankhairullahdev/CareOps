@@ -137,6 +137,7 @@ Write-Host "  API Gateway        http://localhost:5000" -ForegroundColor White
 Write-Host "  Patient Service    http://localhost:5001/swagger" -ForegroundColor White
 Write-Host "  Appointment Svc    http://localhost:5002/swagger" -ForegroundColor White
 Write-Host "  Pharmacy Svc       http://localhost:5003/swagger" -ForegroundColor White
+Write-Host "  Billing Svc        http://localhost:5004/swagger" -ForegroundColor White
 Write-Host "  Notification Svc   http://localhost:5005/swagger" -ForegroundColor White
 Write-Host ""
 Write-Host "  Keycloak Admin     http://localhost:8080  (admin/admin)" -ForegroundColor DarkYellow
