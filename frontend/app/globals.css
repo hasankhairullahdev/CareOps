@@ -2,10 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --sidebar-width: 240px;
+body {
+  @apply bg-[#f4f6f9] text-gray-800 antialiased;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { @apply bg-transparent; }
+::-webkit-scrollbar-thumb { @apply bg-gray-200 rounded-full; }
+
+.card {
+  @apply bg-white rounded-2xl shadow-sm border border-gray-100;
 }
