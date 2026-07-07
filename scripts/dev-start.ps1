@@ -3,7 +3,7 @@
 # Jalankan infra via Docker, semua service via dotnet run di terminal terpisah
 # ==============================================================================
 # Usage:
-#   .\scripts\dev-start.ps1          # start infra + semua service
+#   .\scripts\dev-start.ps1          # start infra + semua service + frontend
 #   .\scripts\dev-start.ps1 -Stop    # stop semua + matikan infra
 #   .\scripts\dev-start.ps1 -Infra   # hanya start infra (postgres, rabbitmq, keycloak)
 # ==============================================================================
@@ -24,10 +24,15 @@ if ($Stop) {
     Write-Step "Stopping all dotnet processes (CareOps services)..."
     Get-Process -Name "dotnet" -ErrorAction SilentlyContinue | ForEach-Object {
         $cmdline = (Get-WmiObject Win32_Process -Filter "ProcessId=$($_.Id)").CommandLine
-        if ($cmdline -match "PatientService|AppointmentService|PharmacyService|NotificationService|HospitalGateway") {
+        if ($cmdline -match "PatientService|AppointmentService|PharmacyService|BillingService|NotificationService|HospitalGateway") {
             $_.Kill()
             Write-Ok "Killed PID $($_.Id)"
         }
+    }
+    Write-Step "Stopping Node (frontend)..."
+    Get-Process -Name "node" -ErrorAction SilentlyContinue | ForEach-Object {
+        $_.Kill()
+        Write-Ok "Killed node PID $($_.Id)"
     }
     Write-Step "Stopping Podman infra..."
     podman compose -f "$Root\docker-compose.infra.yml" down
@@ -49,6 +54,14 @@ if (-not (Get-Command podman -ErrorAction SilentlyContinue)) {
     exit 1
 }
 Write-Ok "Podman: $(podman --version)"
+
+if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
+    Write-Warn "npm not found — frontend akan dilewati. Install Node.js dari https://nodejs.org"
+    $SkipFrontend = $true
+} else {
+    Write-Ok "npm: $(npm --version)"
+    $SkipFrontend = $false
+}
 
 # ─── START INFRA ───────────────────────────────────────────────────────────────
 Write-Step "Starting infrastructure (PostgreSQL, RabbitMQ, Keycloak)..."
@@ -87,13 +100,14 @@ if ($Infra) {
     exit 0
 }
 
-# ─── START SERVICES ────────────────────────────────────────────────────────────
+# ─── START BACKEND SERVICES ────────────────────────────────────────────────────
 $Services = @(
-    @{ Name = "patient-service";      Path = "services\patient-service\src\PatientService.Api";                      Port = 5001; Url = "http://localhost:5001" },
-    @{ Name = "appointment-service";  Path = "services\appointment-service\src\AppointmentService.Api";              Port = 5002; Url = "http://localhost:5002" },
-    @{ Name = "pharmacy-service";     Path = "services\pharmacy-service\src\PharmacyService.Api";                    Port = 5003; Url = "http://localhost:5003" },
-    @{ Name = "notification-service"; Path = "services\notification-service\src\NotificationService";                Port = 5005; Url = "http://localhost:5005" },
-    @{ Name = "api-gateway";          Path = "gateway\HospitalGateway";                                              Port = 5000; Url = "http://localhost:5000" }
+    @{ Name = "patient-service";      Path = "services\patient-service\src\PatientService.Api";         Port = 5001; Url = "http://localhost:5001" },
+    @{ Name = "appointment-service";  Path = "services\appointment-service\src\AppointmentService.Api"; Port = 5002; Url = "http://localhost:5002" },
+    @{ Name = "pharmacy-service";     Path = "services\pharmacy-service\src\PharmacyService.Api";       Port = 5003; Url = "http://localhost:5003" },
+    @{ Name = "billing-service";      Path = "services\billing-service\src\BillingService.Api";         Port = 5004; Url = "http://localhost:5004" },
+    @{ Name = "notification-service"; Path = "services\notification-service\src\NotificationService";   Port = 5005; Url = "http://localhost:5005" },
+    @{ Name = "api-gateway";          Path = "gateway\HospitalGateway";                                 Port = 5000; Url = "http://localhost:5000" }
 )
 
 Write-Step "Starting backend services in separate windows..."
@@ -101,30 +115,47 @@ Write-Step "Starting backend services in separate windows..."
 foreach ($svc in $Services) {
     $fullPath = Join-Path $Root $svc.Path
     $title    = "CareOps | $($svc.Name) :$($svc.Port)"
-
-    $cmd = if ($svc.Cmd -eq "npm") {
-        "& { `$host.UI.RawUI.WindowTitle = '$title'; Set-Location '$fullPath'; npm run dev }"
-    } else {
-        "& { `$host.UI.RawUI.WindowTitle = '$title'; Set-Location '$fullPath'; `$env:ASPNETCORE_ENVIRONMENT = 'Development'; dotnet run }"
-    }
+    $cmd      = "& { `$host.UI.RawUI.WindowTitle = '$title'; Set-Location '$fullPath'; `$env:ASPNETCORE_ENVIRONMENT = 'Development'; dotnet run }"
 
     Start-Process powershell -ArgumentList @("-NoExit", "-Command", $cmd) -WindowStyle Normal
-
-    Write-Ok "Started $($svc.Name) → $($svc.Url)"
+    Write-Ok "Started $($svc.Name) -> $($svc.Url)"
     Start-Sleep -Milliseconds 800
+}
+
+# ─── START FRONTEND ────────────────────────────────────────────────────────────
+if (-not $SkipFrontend) {
+    Write-Step "Starting frontend (Next.js)..."
+    $frontendPath  = Join-Path $Root "frontend"
+    $frontendTitle = "CareOps | frontend :3000"
+
+    # Pastikan .env.local ada
+    $envLocal   = Join-Path $frontendPath ".env.local"
+    $envExample = Join-Path $frontendPath ".env.example"
+    if (-not (Test-Path $envLocal)) {
+        if (Test-Path $envExample) {
+            Copy-Item $envExample $envLocal
+            Write-Warn ".env.local belum ada — dicopy dari .env.example. Sesuaikan isinya!"
+        } else {
+            Write-Warn ".env.local tidak ditemukan. Frontend mungkin gagal boot."
+        }
+    }
+
+    $cmd = "& { `$host.UI.RawUI.WindowTitle = '$frontendTitle'; Set-Location '$frontendPath'; npm run dev }"
+    Start-Process powershell -ArgumentList @("-NoExit", "-Command", $cmd) -WindowStyle Normal
+    Write-Ok "Started frontend -> http://localhost:3000"
 }
 
 # ─── WAIT & HEALTH CHECK ───────────────────────────────────────────────────────
 Write-Step "Waiting 15s for services to boot..."
 Start-Sleep -Seconds 15
 
-Write-Step "Health checks..."
+Write-Step "Health checks (backend)..."
 foreach ($svc in $Services) {
     try {
         $resp = Invoke-WebRequest -Uri "$($svc.Url)/health" -TimeoutSec 5 -ErrorAction Stop
-        Write-Ok "$($svc.Name) → $($resp.StatusCode) HEALTHY"
+        Write-Ok "$($svc.Name) -> $($resp.StatusCode) HEALTHY"
     } catch {
-        Write-Warn "$($svc.Name) → not ready yet (still booting?)"
+        Write-Warn "$($svc.Name) -> not ready yet (still booting?)"
     }
 }
 
