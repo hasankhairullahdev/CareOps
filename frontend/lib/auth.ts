@@ -14,18 +14,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, account, profile }) {
       if (account) {
-        token.accessToken = account.access_token;
-        token.idToken = account.id_token;
-        // Extract realm roles from Keycloak token
-        const realmAccess = (profile as any)?.realm_access;
-        token.roles = realmAccess?.roles ?? [];
+        token.accessToken  = account.access_token;
+        token.idToken      = account.id_token;
+        token.refreshToken = account.refresh_token;
+        const realmAccess  = (profile as any)?.realm_access;
+        token.roles        = realmAccess?.roles ?? [];
       }
       return token;
     },
     async session({ session, token }) {
       session.accessToken = token.accessToken as string;
-      session.roles = (token.roles as string[]) ?? [];
+      session.idToken     = token.idToken     as string;
+      session.roles       = (token.roles as string[]) ?? [];
       return session;
+    },
+  },
+  events: {
+    // Logout dari Keycloak saat signOut
+    async signOut(message) {
+      const idToken = (message as any)?.token?.idToken;
+      if (idToken && process.env.KEYCLOAK_ISSUER) {
+        const logoutUrl =
+          `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/logout` +
+          `?id_token_hint=${idToken}` +
+          `&post_logout_redirect_uri=${encodeURIComponent(process.env.NEXTAUTH_URL ?? "http://localhost:3000")}`;
+        // Fire-and-forget — Keycloak akan invalidate session
+        await fetch(logoutUrl).catch(() => {});
+      }
     },
   },
   pages: {
