@@ -41,11 +41,18 @@ public class AppointmentCreatedConsumer : IConsumer<AppointmentCreatedMessage>
             .AnyAsync(b => b.AppointmentId == msg.AppointmentId, context.CancellationToken);
         if (exists) return;
 
+        // Look up consultation tariff — fall back to 150,000 if not configured
+        var consultationFee = await _context.ServiceTariffs
+            .Where(t => t.Category == "Consultation" && t.IsActive)
+            .OrderBy(t => t.Price)
+            .Select(t => (decimal?)t.Price)
+            .FirstOrDefaultAsync(context.CancellationToken) ?? 150_000m;
+
         var bill = Bill.Create(
             msg.PatientId,
             msg.AppointmentId,
             $"Biaya konsultasi dengan {msg.DoctorName}",
-            150_000m); // default consultation fee
+            consultationFee);
 
         _context.Bills.Add(bill);
         await _context.SaveChangesAsync(context.CancellationToken);

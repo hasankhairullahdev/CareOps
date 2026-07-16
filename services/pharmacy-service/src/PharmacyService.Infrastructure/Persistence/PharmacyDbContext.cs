@@ -12,6 +12,7 @@ public class PharmacyDbContext : DbContext
     public DbSet<Prescription> Prescriptions => Set<Prescription>();
     public DbSet<PrescriptionItem> PrescriptionItems => Set<PrescriptionItem>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -51,6 +52,17 @@ public class PharmacyDbContext : DbContext
             e.Property(x => x.Id).ValueGeneratedNever();
             e.Property(x => x.Type).HasConversion<string>().IsRequired();
             e.Property(x => x.Reason).HasMaxLength(500);
+        });
+
+        modelBuilder.Entity<Supplier>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.Name).IsRequired().HasMaxLength(200);
+            e.Property(x => x.ContactPerson).HasMaxLength(100);
+            e.Property(x => x.Phone).HasMaxLength(30);
+            e.Property(x => x.Email).HasMaxLength(200);
+            e.Property(x => x.Address).HasMaxLength(500);
         });
 
         // Seed medicines

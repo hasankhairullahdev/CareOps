@@ -116,19 +116,6 @@ public static class AppointmentEndpoints
         .RequireAuthorization()
         .WithName("CreatePrescription");
 
-        // GET /doctors/{id}/schedule
-        var doctorGroup = app.MapGroup("/doctors").WithTags("Doctors");
-        doctorGroup.MapGet("/{id:guid}/schedule", async (
-            Guid id,
-            [FromQuery] DateOnly? date,
-            ISender sender,
-            CancellationToken ct) =>
-        {
-            var result = await sender.Send(new GetDoctorScheduleQuery(id, date ?? DateOnly.FromDateTime(DateTime.UtcNow)), ct);
-            return Results.Ok(result);
-        })
-        .RequireAuthorization()
-        .WithName("GetDoctorSchedule");
     }
 }
 

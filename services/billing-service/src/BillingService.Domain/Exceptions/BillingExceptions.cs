@@ -18,3 +18,9 @@ public sealed class BillNotIssuedException : Exception
     public BillNotIssuedException(Guid billId)
         : base($"Bill '{billId}' must be in Issued status before payment.") { }
 }
+
+public sealed class ServiceTariffNotFoundException : Exception
+{
+    public ServiceTariffNotFoundException(Guid tariffId)
+        : base($"Service tariff with ID '{tariffId}' was not found.") { }
+}

@@ -124,5 +124,7 @@ app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
 }));
 
 app.MapBillingEndpoints();
+app.MapServiceTariffEndpoints();
+app.MapPaymentMethodEndpoints();
 app.MapHealthChecks("/health");
 app.Run();

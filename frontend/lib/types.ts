@@ -41,6 +41,33 @@ export interface Doctor {
   specialization: string;
   licenseNumber: string;
   schedule: string;
+  phone?: string;
+  email?: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+// ── ServiceTariff ─────────────────────────────────────────────────────────────
+
+export interface ServiceTariff {
+  id: string;
+  serviceName: string;
+  category: string;
+  price: number;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface PaginatedDoctorsResult {
+  items: Doctor[];
+  totalCount: number;
+}
+
+export interface PaginatedTariffsResult {
+  items: ServiceTariff[];
+  totalCount: number;
 }
 
 // ── Pharmacy ──────────────────────────────────────────────────────────────────
@@ -114,4 +141,47 @@ export interface BillsSummary {
   paidTodayCount: number;
   paidTodayAmount: number;
   totalTodayCount: number;
+}
+
+// ── Lookups (patient-service) ─────────────────────────────────────────────────
+
+export interface BloodType {
+  id: number;
+  name: string;
+}
+
+export interface AllergyType {
+  id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+// ── Supplier (pharmacy-service) ───────────────────────────────────────────────
+
+export interface Supplier {
+  id: string;
+  name: string;
+  contactPerson?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface GetSuppliersResult {
+  items: Supplier[];
+  totalCount: number;
+}
+
+// ── PaymentMethod (billing-service) ──────────────────────────────────────────
+
+export interface PaymentMethod {
+  id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
 }

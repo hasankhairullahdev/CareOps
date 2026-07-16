@@ -121,5 +121,6 @@ app.UseExceptionHandler(errorApp => errorApp.Run(async context =>
 }));
 
 app.MapPharmacyEndpoints();
+app.MapSupplierEndpoints();
 app.MapHealthChecks("/health");
 app.Run();

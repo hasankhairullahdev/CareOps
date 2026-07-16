@@ -64,6 +64,46 @@ export const appointmentsApi = {
     apiFetch(`/api/doctors/${doctorId}/schedule?date=${date}`, token),
 };
 
+// ── Doctors ───────────────────────────────────────────────────────────────────
+export const doctorsApi = {
+  list: (token: string, params?: Record<string, string>) => {
+    const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+    return apiFetch(`/api/doctors${qs}`, token);
+  },
+
+  get: (token: string, id: string) =>
+    apiFetch(`/api/doctors/${id}`, token),
+
+  create: (token: string, data: unknown) =>
+    apiFetch(`/api/doctors`, token, { method: "POST", body: JSON.stringify(data) }),
+
+  update: (token: string, id: string, data: unknown) =>
+    apiFetch(`/api/doctors/${id}`, token, { method: "PUT", body: JSON.stringify(data) }),
+
+  delete: (token: string, id: string) =>
+    apiFetch(`/api/doctors/${id}`, token, { method: "DELETE" }),
+};
+
+// ── ServiceTariffs ────────────────────────────────────────────────────────────
+export const tariffsApi = {
+  list: (token: string, params?: Record<string, string>) => {
+    const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+    return apiFetch(`/api/billing/tariffs${qs}`, token);
+  },
+
+  get: (token: string, id: string) =>
+    apiFetch(`/api/billing/tariffs/${id}`, token),
+
+  create: (token: string, data: unknown) =>
+    apiFetch(`/api/billing/tariffs`, token, { method: "POST", body: JSON.stringify(data) }),
+
+  update: (token: string, id: string, data: unknown) =>
+    apiFetch(`/api/billing/tariffs/${id}`, token, { method: "PUT", body: JSON.stringify(data) }),
+
+  delete: (token: string, id: string) =>
+    apiFetch(`/api/billing/tariffs/${id}`, token, { method: "DELETE" }),
+};
+
 // ── Pharmacy ──────────────────────────────────────────────────────────────────
 export const pharmacyApi = {
   inventory: (token: string, params?: Record<string, string>) => {
@@ -82,6 +122,60 @@ export const pharmacyApi = {
 
   addStock: (token: string, medicineId: string, quantity: number, reason: string) =>
     apiFetch(`/api/pharmacy/stock`, token, { method: "POST", body: JSON.stringify({ medicineId, quantity, reason }) }),
+};
+
+// ── Lookups (patient-service) ─────────────────────────────────────────────────
+export const lookupsApi = {
+  bloodTypes: (token: string) =>
+    apiFetch(`/api/blood-types`, token),
+
+  allergyTypes: (token: string, isActive?: boolean) => {
+    const qs = isActive !== undefined ? `?isActive=${isActive}` : "";
+    return apiFetch(`/api/allergy-types${qs}`, token);
+  },
+
+  createAllergyType: (token: string, data: unknown) =>
+    apiFetch(`/api/allergy-types`, token, { method: "POST", body: JSON.stringify(data) }),
+
+  updateAllergyType: (token: string, id: string, data: unknown) =>
+    apiFetch(`/api/allergy-types/${id}`, token, { method: "PUT", body: JSON.stringify(data) }),
+
+  deleteAllergyType: (token: string, id: string) =>
+    apiFetch(`/api/allergy-types/${id}`, token, { method: "DELETE" }),
+};
+
+// ── Suppliers (pharmacy-service) ──────────────────────────────────────────────
+export const suppliersApi = {
+  list: (token: string, params?: Record<string, string>) => {
+    const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+    return apiFetch(`/api/pharmacy/suppliers${qs}`, token);
+  },
+
+  create: (token: string, data: unknown) =>
+    apiFetch(`/api/pharmacy/suppliers`, token, { method: "POST", body: JSON.stringify(data) }),
+
+  update: (token: string, id: string, data: unknown) =>
+    apiFetch(`/api/pharmacy/suppliers/${id}`, token, { method: "PUT", body: JSON.stringify(data) }),
+
+  delete: (token: string, id: string) =>
+    apiFetch(`/api/pharmacy/suppliers/${id}`, token, { method: "DELETE" }),
+};
+
+// ── PaymentMethods (billing-service) ──────────────────────────────────────────
+export const paymentMethodsApi = {
+  list: (token: string, isActive?: boolean) => {
+    const qs = isActive !== undefined ? `?isActive=${isActive}` : "";
+    return apiFetch(`/api/billing/payment-methods${qs}`, token);
+  },
+
+  create: (token: string, data: unknown) =>
+    apiFetch(`/api/billing/payment-methods`, token, { method: "POST", body: JSON.stringify(data) }),
+
+  update: (token: string, id: string, data: unknown) =>
+    apiFetch(`/api/billing/payment-methods/${id}`, token, { method: "PUT", body: JSON.stringify(data) }),
+
+  delete: (token: string, id: string) =>
+    apiFetch(`/api/billing/payment-methods/${id}`, token, { method: "DELETE" }),
 };
 
 // ── Billing ───────────────────────────────────────────────────────────────────

@@ -6,7 +6,7 @@ import { hasAnyRole, type UserRole } from "@/lib/roles";
 import {
   LayoutDashboard, Users, Calendar, Pill, Receipt,
   Settings, LogOut, Stethoscope, ChevronRight,
-  Building2, Bell, Search,
+  UserCog, Tag, Truck, CreditCard, AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,7 @@ const navGroups = [
     items: [
       { href: "/patients",     label: "Patients",     icon: Users,     roles: ["admin","receptionist","doctor","pharmacist","cashier"] as UserRole[] },
       { href: "/appointments", label: "Appointments", icon: Calendar,  roles: ["admin","receptionist","doctor","cashier","patient"] as UserRole[] },
+      { href: "/doctors",      label: "Doctors",      icon: UserCog,   roles: ["admin","receptionist","doctor","cashier"] as UserRole[] },
       { href: "/pharmacy",     label: "Pharmacy",     icon: Pill,      roles: ["admin","pharmacist"] as UserRole[] },
     ],
   },
@@ -34,7 +35,11 @@ const navGroups = [
   {
     label: "Administration",
     items: [
-      { href: "/admin",        label: "Admin",        icon: Settings,  roles: ["admin"] as UserRole[] },
+      { href: "/admin/tariffs",         label: "Service Tariffs",   icon: Tag,        roles: ["admin"] as UserRole[] },
+      { href: "/admin/payment-methods", label: "Payment Methods",   icon: CreditCard, roles: ["admin"] as UserRole[] },
+      { href: "/admin/suppliers",       label: "Suppliers",         icon: Truck,      roles: ["admin","pharmacist"] as UserRole[] },
+      { href: "/admin/allergy-types",   label: "Allergy Types",     icon: AlertCircle, roles: ["admin"] as UserRole[] },
+      { href: "/admin",                 label: "Admin",              icon: Settings,   roles: ["admin"] as UserRole[] },
     ],
   },
 ];

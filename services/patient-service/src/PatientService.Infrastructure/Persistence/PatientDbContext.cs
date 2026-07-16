@@ -8,6 +8,8 @@ public class PatientDbContext : DbContext
     public PatientDbContext(DbContextOptions<PatientDbContext> options) : base(options) { }
 
     public DbSet<Patient> Patients => Set<Patient>();
+    public DbSet<BloodType> BloodTypes => Set<BloodType>();
+    public DbSet<AllergyType> AllergyTypes => Set<AllergyType>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,6 +27,30 @@ public class PatientDbContext : DbContext
             entity.Property(e => e.MedicalRecordNumber).IsRequired().HasMaxLength(50);
             entity.HasIndex(e => e.MedicalRecordNumber).IsUnique();
             entity.HasIndex(e => e.Email).IsUnique();
+        });
+
+        modelBuilder.Entity<BloodType>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.Name).IsRequired().HasMaxLength(10);
+            e.HasIndex(x => x.Name).IsUnique();
+            // Seed all standard blood types
+            e.HasData(
+                new BloodType(1, "A+"), new BloodType(2, "A-"),
+                new BloodType(3, "B+"), new BloodType(4, "B-"),
+                new BloodType(5, "AB+"), new BloodType(6, "AB-"),
+                new BloodType(7, "O+"), new BloodType(8, "O-")
+            );
+        });
+
+        modelBuilder.Entity<AllergyType>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedNever();
+            e.Property(x => x.Name).IsRequired().HasMaxLength(100);
+            e.Property(x => x.Description).HasMaxLength(300);
+            e.HasIndex(x => x.Name).IsUnique();
         });
         // Seed data is handled via migration (InitialCreate)
     }

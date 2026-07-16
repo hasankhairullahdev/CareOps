@@ -152,6 +152,7 @@ app.UseExceptionHandler(errorApp =>
 
 // Endpoints
 app.MapPatientEndpoints();
+app.MapLookupEndpoints();
 app.MapHealthChecks("/health");
 
 app.Run();

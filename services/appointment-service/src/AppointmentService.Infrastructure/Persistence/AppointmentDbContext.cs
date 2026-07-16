@@ -43,6 +43,10 @@ public class AppointmentDbContext : DbContext
             entity.Property(e => e.LicenseNumber).IsRequired().HasMaxLength(50);
             entity.HasIndex(e => e.LicenseNumber).IsUnique();
             entity.Property(e => e.Schedule).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Phone).HasMaxLength(30);
+            entity.Property(e => e.Email).HasMaxLength(200);
+            entity.Property(e => e.IsActive).IsRequired().HasDefaultValue(true);
+            entity.Property(e => e.CreatedAt).IsRequired();
         });
 
         modelBuilder.Entity<Prescription>(entity =>
@@ -66,9 +70,9 @@ public class AppointmentDbContext : DbContext
 
         // Seed doctors
         modelBuilder.Entity<Doctor>().HasData(
-            new { Id = new Guid("d0000000-0000-0000-0000-000000000001"), Name = "Dr. Andi Wirawan", Specialization = "General Practice", LicenseNumber = "STR-001-2024", Schedule = "Mon-Fri 08:00-16:00" },
-            new { Id = new Guid("d0000000-0000-0000-0000-000000000002"), Name = "Dr. Sari Kusuma", Specialization = "Internal Medicine", LicenseNumber = "STR-002-2024", Schedule = "Mon-Fri 09:00-17:00" },
-            new { Id = new Guid("d0000000-0000-0000-0000-000000000003"), Name = "Dr. Bima Prasetyo", Specialization = "Pediatrics", LicenseNumber = "STR-003-2024", Schedule = "Tue-Sat 08:00-15:00" }
+            new { Id = new Guid("d0000000-0000-0000-0000-000000000001"), Name = "Dr. Andi Wirawan", Specialization = "General Practice", LicenseNumber = "STR-001-2024", Schedule = "Mon-Fri 08:00-16:00", Phone = (string?)null, Email = (string?)null, IsActive = true, CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new { Id = new Guid("d0000000-0000-0000-0000-000000000002"), Name = "Dr. Sari Kusuma", Specialization = "Internal Medicine", LicenseNumber = "STR-002-2024", Schedule = "Mon-Fri 09:00-17:00", Phone = (string?)null, Email = (string?)null, IsActive = true, CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new { Id = new Guid("d0000000-0000-0000-0000-000000000003"), Name = "Dr. Bima Prasetyo", Specialization = "Pediatrics", LicenseNumber = "STR-003-2024", Schedule = "Tue-Sat 08:00-15:00", Phone = (string?)null, Email = (string?)null, IsActive = true, CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
         );
     }
 }

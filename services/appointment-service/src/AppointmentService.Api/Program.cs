@@ -1,6 +1,7 @@
 using AppointmentService.Api.Endpoints;
 using AppointmentService.Application.Behaviors;
 using AppointmentService.Application.Appointments.Commands;
+using AppointmentService.Application.Doctors.Commands;
 using AppointmentService.Infrastructure.Persistence;
 using FluentValidation;
 using MassTransit;

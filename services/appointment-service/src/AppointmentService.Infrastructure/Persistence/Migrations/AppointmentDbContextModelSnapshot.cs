@@ -18,6 +18,86 @@ namespace AppointmentService.Infrastructure.Persistence.Migrations
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0")
                         .HasAnnotation("Relational:MaxIdentifierLength", 63);
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("AppointmentService.Domain.Entities.Appointment", b =>
+            {
+                b.Property<Guid>("Id").ValueGeneratedNever().HasColumnType("uuid");
+                b.Property<DateTime>("CreatedAt").HasColumnType("timestamp with time zone");
+                b.Property<Guid>("DoctorId").HasColumnType("uuid");
+                b.Property<string>("Notes").HasMaxLength(1000).HasColumnType("character varying(1000)");
+                b.Property<Guid>("PatientId").HasColumnType("uuid");
+                b.Property<DateTime>("ScheduledAt").HasColumnType("timestamp with time zone");
+                b.Property<string>("Status").IsRequired().HasColumnType("text");
+                b.Property<DateTime?>("UpdatedAt").HasColumnType("timestamp with time zone");
+                b.HasKey("Id");
+                b.HasIndex("PatientId");
+                b.HasIndex("DoctorId", "ScheduledAt");
+                b.ToTable("Appointments");
+            });
+
+            modelBuilder.Entity("AppointmentService.Domain.Entities.Doctor", b =>
+            {
+                b.Property<Guid>("Id").ValueGeneratedNever().HasColumnType("uuid");
+                b.Property<DateTime>("CreatedAt").IsRequired().HasColumnType("timestamp with time zone");
+                b.Property<string>("Email").HasMaxLength(200).HasColumnType("character varying(200)");
+                b.Property<bool>("IsActive").IsRequired().HasDefaultValue(true).HasColumnType("boolean");
+                b.Property<string>("LicenseNumber").IsRequired().HasMaxLength(50).HasColumnType("character varying(50)");
+                b.Property<string>("Name").IsRequired().HasMaxLength(200).HasColumnType("character varying(200)");
+                b.Property<string>("Phone").HasMaxLength(30).HasColumnType("character varying(30)");
+                b.Property<string>("Schedule").IsRequired().HasMaxLength(200).HasColumnType("character varying(200)");
+                b.Property<string>("Specialization").IsRequired().HasMaxLength(100).HasColumnType("character varying(100)");
+                b.HasKey("Id");
+                b.HasIndex("LicenseNumber").IsUnique();
+                b.ToTable("Doctors");
+                b.HasData(
+                    new { Id = new Guid("d0000000-0000-0000-0000-000000000001"), Name = "Dr. Andi Wirawan", Specialization = "General Practice", LicenseNumber = "STR-001-2024", Schedule = "Mon-Fri 08:00-16:00", IsActive = true, CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                    new { Id = new Guid("d0000000-0000-0000-0000-000000000002"), Name = "Dr. Sari Kusuma", Specialization = "Internal Medicine", LicenseNumber = "STR-002-2024", Schedule = "Mon-Fri 09:00-17:00", IsActive = true, CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                    new { Id = new Guid("d0000000-0000-0000-0000-000000000003"), Name = "Dr. Bima Prasetyo", Specialization = "Pediatrics", LicenseNumber = "STR-003-2024", Schedule = "Tue-Sat 08:00-15:00", IsActive = true, CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
+                );
+            });
+
+            modelBuilder.Entity("AppointmentService.Domain.Entities.Prescription", b =>
+            {
+                b.Property<Guid>("Id").ValueGeneratedNever().HasColumnType("uuid");
+                b.Property<Guid>("AppointmentId").HasColumnType("uuid");
+                b.Property<DateTime>("CreatedAt").HasColumnType("timestamp with time zone");
+                b.Property<Guid>("PatientId").HasColumnType("uuid");
+                b.HasKey("Id");
+                b.ToTable("Prescriptions");
+            });
+
+            modelBuilder.Entity("AppointmentService.Domain.Entities.PrescriptionItem", b =>
+            {
+                b.Property<Guid>("Id").ValueGeneratedNever().HasColumnType("uuid");
+                b.Property<string>("Dosage").IsRequired().HasMaxLength(100).HasColumnType("character varying(100)");
+                b.Property<string>("Instructions").HasMaxLength(500).HasColumnType("character varying(500)");
+                b.Property<string>("MedicineName").IsRequired().HasMaxLength(200).HasColumnType("character varying(200)");
+                b.Property<Guid>("PrescriptionId").HasColumnType("uuid");
+                b.Property<int>("Quantity").HasColumnType("integer");
+                b.HasKey("Id");
+                b.HasIndex("PrescriptionId");
+                b.ToTable("PrescriptionItems");
+            });
+
+            modelBuilder.Entity("AppointmentService.Domain.Entities.Appointment", b =>
+            {
+                b.HasOne("AppointmentService.Domain.Entities.Doctor", "Doctor")
+                 .WithMany()
+                 .HasForeignKey("DoctorId")
+                 .OnDelete(DeleteBehavior.Restrict)
+                 .IsRequired();
+                b.Navigation("Doctor");
+            });
+
+            modelBuilder.Entity("AppointmentService.Domain.Entities.Prescription", b =>
+            {
+                b.HasMany("AppointmentService.Domain.Entities.PrescriptionItem", "Items")
+                 .WithOne()
+                 .HasForeignKey("PrescriptionId")
+                 .OnDelete(DeleteBehavior.Cascade)
+                 .IsRequired();
+                b.Navigation("Items");
+            });
 #pragma warning restore 612, 618
         }
     }
